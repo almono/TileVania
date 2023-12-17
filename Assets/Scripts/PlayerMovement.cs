@@ -8,6 +8,9 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] float runSpeed = 7f;
     [SerializeField] float jumpPower = 15f;
+    [SerializeField] float climbSpeed = 5f;
+
+    private float baseGravity = 8f;
 
     Vector2 moveInput;
     Rigidbody2D playerBody;
@@ -20,6 +23,7 @@ public class PlayerMovement : MonoBehaviour
         playerBody = GetComponent<Rigidbody2D>();
         playerAnimation = GetComponent<Animator>();
         capsuleCollider = GetComponent<CapsuleCollider2D>();
+        playerBody.gravityScale = baseGravity;
     }
 
     // Update is called once per frame
@@ -27,6 +31,7 @@ public class PlayerMovement : MonoBehaviour
     {
         Run();
         FlipSprite();
+        ClimbLadder();
     }
 
     void OnMove(InputValue value)
@@ -64,5 +69,23 @@ public class PlayerMovement : MonoBehaviour
         {
             transform.localScale = new Vector2(Mathf.Sign(playerBody.velocity.x), 1f);
         }
+    }
+
+    void ClimbLadder()
+    {
+        // if player is not touching the climbable then dont allow climbing
+        if (!capsuleCollider.IsTouchingLayers(LayerMask.GetMask("Climb"))) 
+        {
+            playerBody.gravityScale = baseGravity;
+            playerAnimation.SetBool("isClimbing", false);
+            return; 
+        }
+
+        Vector2 climbVelocity = new Vector2(playerBody.velocity.x, moveInput.y * climbSpeed);
+        playerBody.velocity = climbVelocity;
+        playerBody.gravityScale = 0f;
+
+        bool playerIsMovingVertically = Mathf.Abs(playerBody.velocity.y) > Mathf.Epsilon;
+        playerAnimation.SetBool("isClimbing", playerIsMovingVertically);
     }
 }
