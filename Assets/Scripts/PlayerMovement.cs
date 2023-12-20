@@ -9,8 +9,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float runSpeed = 7f;
     [SerializeField] float jumpPower = 20f;
     [SerializeField] float climbSpeed = 5f;
+    [SerializeField] Vector2 deathKnockback = new Vector2(10f, 10f);
 
     private float baseGravity = 8f;
+    [SerializeField] bool isAlive = true;
 
     Vector2 moveInput;
     Rigidbody2D playerBody;
@@ -32,20 +34,27 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Run();
-        FlipSprite();
-        ClimbLadder();
+        if(isAlive)
+        {
+            Run();
+            FlipSprite();
+            ClimbLadder();
+            Die();
+        }
     }
 
     void OnMove(InputValue value)
     {
+        if(!isAlive) { return; }
         moveInput = value.Get<Vector2>();
     }
 
     void OnJump(InputValue value)
     {
+        if (!isAlive) { return; }
+
         // if player is not touching the ground then dont allow jump
-        if(!feetCollider.IsTouchingLayers(LayerMask.GetMask("Ground"))) { return; }
+        if (!feetCollider.IsTouchingLayers(LayerMask.GetMask("Ground"))) { return; }
 
         if(value.isPressed)
         {
@@ -90,5 +99,15 @@ public class PlayerMovement : MonoBehaviour
 
         bool playerIsMovingVertically = Mathf.Abs(playerBody.velocity.y) > Mathf.Epsilon;
         playerAnimation.SetBool("isClimbing", playerIsMovingVertically);
+    }
+
+    void Die()
+    {
+        if(bodyCollider.IsTouchingLayers(LayerMask.GetMask("Enemy")))
+        {
+            isAlive = false;
+            playerAnimation.SetTrigger("isKilled");
+            playerBody.velocity = deathKnockback;
+        }
     }
 }
