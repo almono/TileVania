@@ -9,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float runSpeed = 7f;
     [SerializeField] float jumpPower = 20f;
     [SerializeField] float climbSpeed = 5f;
-    [SerializeField] Vector2 deathKnockback = new Vector2(10f, 10f);
+    [SerializeField] Vector2 deathKnockback = new Vector2(5f, 10f);
 
     private float baseGravity = 8f;
     [SerializeField] bool isAlive = true;
@@ -103,7 +103,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Die()
     {
-        if(bodyCollider.IsTouchingLayers(LayerMask.GetMask("Enemy")))
+        if(bodyCollider.IsTouchingLayers(LayerMask.GetMask("Enemy", "Hazards")))
         {
             isAlive = false;
             playerAnimation.SetTrigger("isKilled");
