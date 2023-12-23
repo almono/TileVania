@@ -10,8 +10,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float jumpPower = 20f;
     [SerializeField] float climbSpeed = 5f;
     [SerializeField] Vector2 deathKnockback = new Vector2(5f, 10f);
+    [SerializeField] GameObject playerBullet;
+    [SerializeField] GameObject playerGun;
 
     private float baseGravity = 8f;
+    private bool isFacingRight = true;
     [SerializeField] bool isAlive = true;
 
     Vector2 moveInput;
@@ -62,6 +65,24 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    void OnFire(InputValue value)
+    {
+        if (!isAlive) { return; }
+
+        if(value.isPressed)
+        {
+            GameObject newBullet = Instantiate(playerBullet, playerGun.transform.position, playerGun.transform.rotation);
+
+            // we get bullet's script here so we can edit variables in it
+            // then set flag for direction of the bullet
+            Bullet bulletData = newBullet.GetComponent<Bullet>();
+            bulletData.isMovingRight = isFacingRight;
+
+            // set rotation to be the same as player on shot
+            newBullet.transform.localScale = new Vector2(isFacingRight ? 0.3f : -0.3f, 0.3f);
+        }
+    }
+
     void Run()
     {
         Vector2 playerVelocity = new Vector2(moveInput.x * runSpeed, playerBody.velocity.y);
@@ -75,11 +96,12 @@ public class PlayerMovement : MonoBehaviour
     // moving left or right
     void FlipSprite()
     {
-        bool playerIsMovingHorizontally = Mathf.Abs(playerBody.velocity.x) > Mathf.Epsilon; // epsilion is basically 0
+        bool playerIsMovingHorizontally = Mathf.Abs(playerBody.velocity.x) > Mathf.Epsilon; // epsilion is basically 0 but with all the extra digits after comma
 
         if(playerIsMovingHorizontally)
         {
             transform.localScale = new Vector2(Mathf.Sign(playerBody.velocity.x), 1f);
+            isFacingRight = Mathf.Sign(playerBody.velocity.x) > 0 ? true : false;
         }
     }
 
