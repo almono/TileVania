@@ -130,6 +130,7 @@ public class PlayerMovement : MonoBehaviour
             isAlive = false;
             playerAnimation.SetTrigger("isKilled");
             playerBody.velocity = deathKnockback;
+            GameManager.instance.ProcessPlayerDeath();
         }
     }
 }

@@ -7,7 +7,10 @@ public class LevelExit : MonoBehaviour
 {
     void OnTriggerEnter2D(Collider2D other)
     {
-        StartCoroutine(FinishLevel());
+        if(other.CompareTag("Player"))
+        {
+            StartCoroutine(FinishLevel());
+        }
     }
 
     private IEnumerator FinishLevel()
